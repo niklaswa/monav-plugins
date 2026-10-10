@@ -27,6 +27,20 @@
         "prognose.gevas.eu"
       ],
       "file": "plugins/gevas.js"
+    },
+    {
+      "id": "de.ladecloud.ladeapp",
+      "name": "Ladecloud",
+      "version": "1.0",
+      "description": "Ladesäulen mit Live-Verfügbarkeit, Laden mit der Ladekarte, Ladehistorie und Rechnungen – mit einem Ladeapp-Konto. Inoffiziell, nur für den privaten Gebrauch.",
+      "provides": [
+        "chargers",
+        "charging"
+      ],
+      "hosts": [
+        "backend.ladecloud.de"
+      ],
+      "file": "plugins/ladecloud.js"
     }
   ]
 }

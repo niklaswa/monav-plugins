@@ -7,6 +7,7 @@ selbst geschrieben.
 |---|---|---|
 | [GEVAS Ampeln](plugins/gevas.js) | Ampelprognosen (Düsseldorf u. a.) | `gruenzeit.gevas.eu`, `prognose.gevas.eu` |
 | [blitzer.de](plugins/blitzer.js) | Blitzer, Polizeikontrollen, gemeldete Messstrecken | `cdn2.atudo.net` |
+| [Ladecloud](plugins/ladecloud.js) | Ladesäulen live, Laden mit der Ladekarte, Ladehistorie, Rechnungen (Ladeapp-Konto) | `backend.ladecloud.de` |
 
 > Die Plugins hier nutzen inoffizielle Schnittstellen und sind nur für den privaten Gebrauch.
 
@@ -36,7 +37,7 @@ Monav.register({
   version: "1.0",                   // höher = Update in Monav
   author: "Du",
   description: "Was es kann, in einem Satz.",
-  provides: ["trafficLights"],      // oder "speedCameras", oder beides
+  provides: ["trafficLights"],      // auch "speedCameras", "chargers", "charging" – mehrere gehen
   hosts: ["api.example.com"],       // nur diese Server darf es aufrufen (Subdomains inklusive)
   settings: [                       // optional: Felder in Monav › Plugins › dein Plugin
     { key: "apiKey", label: "API-Schlüssel", secret: true },
@@ -103,19 +104,43 @@ Minuten, für rund 7 × 7 km um `position` (`{ latitude, longitude }`). Antwort:
 mobilen Blitzern, als Google-Polyline (`polyline`) oder `path: [[lat, lon], …]`; ohne `zones`
 bleiben die bisherigen stehen.
 
+**`chargers({ position, roaming })`** – mit `provides: ["chargers"]`, etwa alle 1,2 km oder
+2,5 Minuten, für gut 2 km um `position`. Antwort:
+
+```js
+{
+  stations: [{ id, latitude, longitude, title, operator, address, available, total,
+               status: "available" /* occupied, outOfService, unknown */, roaming }],
+  clusters: [{ id, latitude, longitude, count }],   // wo nur die Zahl bekannt ist
+}
+```
+
+Braucht die Quelle ein Konto, gehören `account()` → `{ signedIn }`, `signIn({ username, password })`
+und `signOut()` dazu – Monav zeigt dann die Anmeldung in den Einstellungen und, solange
+niemand angemeldet ist, die Ladestationen aus Apple Karten. Zugangsdaten und Tokens gehören in
+`Monav.secrets`.
+
+**Laden** – mit `provides: ["charging"]`: `chargePoint({ stationId })` → `{ station, cards }`,
+`startCharging({ evseId, cardId })` → Ladevorgang, `chargeProcess({ id })`, `stopCharging({ id })`,
+`history({ page })` / `invoices({ page })` → `{ data: [...], hasNext }`, `historyItem({ id })`,
+`invoice({ id })`, `file({ url })` → `{ base64 }`. Die Objekte haben die Form der
+Ladecloud-Schnittstelle – [ladecloud.js](plugins/ladecloud.js) zeigt sie. `startCharging`
+kostet Geld: Monav fragt vorher nach, nie ruft es das von selbst auf.
+
 ### Was ein Plugin hat
 
 | | |
 |---|---|
-| `fetch(url, { method, headers, body, json })` | Antwort: `{ status, ok, headers, text, json() }`. Nur zu den `hosts`. `json:` schickt JSON. |
+| `fetch(url, { method, headers, body, json, binary })` | Antwort: `{ status, ok, headers, text, json(), base64 }`. Nur zu den `hosts`. `json:` schickt JSON, `binary: true` liefert den Inhalt als `base64` (PDFs, Bilder). |
 | `Monav.storage.get(key)` / `.set(key, value)` | bleibt gespeichert (JSON-Werte) |
+| `Monav.secrets.get(key)` / `.set(key, value)` | im Schlüsselbund (Text), für Tokens und Passwörter |
 | `Monav.setting(key)` | was in den Einstellungsfeldern steht |
 | `Monav.sleep(ms)` | Promise |
 | `Monav.uuid()` | neue UUID |
 | `Monav.distance(a, b)` | Meter zwischen `{ latitude, longitude }` |
 | `console.log / warn / error` | ins Log des Plugins (Monav › Plugins › Plugin) |
 
-Jeder Aufruf hat 20 Sekunden. Ein Fehler (`throw`) landet im Log und als letzter Fehler in
+Jeder Aufruf hat 20 Sekunden (`chargers` 45, Dateien 60). Ein Fehler (`throw`) landet im Log und als letzter Fehler in
 der Liste.
 
 ## Repository-Format
