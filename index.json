@@ -1,0 +1,19 @@
+{
+  "name": "Monav Plugins",
+  "plugins": [
+    {
+      "id": "de.gevas.trafficpilot",
+      "name": "GEVAS Ampeln",
+      "version": "1.0",
+      "description": "Ampelprognosen von GEVAS / TrafficPilot – Düsseldorf und weitere Städte. Inoffiziell, nur für den privaten Gebrauch.",
+      "provides": [
+        "trafficLights"
+      ],
+      "hosts": [
+        "gruenzeit.gevas.eu",
+        "prognose.gevas.eu"
+      ],
+      "file": "plugins/gevas.js"
+    }
+  ]
+}
