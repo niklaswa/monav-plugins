@@ -2,6 +2,19 @@
   "name": "Monav Plugins",
   "plugins": [
     {
+      "id": "de.blitzer.map",
+      "name": "blitzer.de",
+      "version": "1.0",
+      "description": "Blitzer, Polizeikontrollen und gemeldete Messstrecken von blitzer.de. Inoffiziell, nur für den privaten Gebrauch.",
+      "provides": [
+        "speedCameras"
+      ],
+      "hosts": [
+        "cdn2.atudo.net"
+      ],
+      "file": "plugins/blitzer.js"
+    },
+    {
       "id": "de.gevas.trafficpilot",
       "name": "GEVAS Ampeln",
       "version": "1.0",

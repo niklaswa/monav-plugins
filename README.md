@@ -6,6 +6,7 @@ selbst geschrieben.
 | Plugin | Liefert | Spricht mit |
 |---|---|---|
 | [GEVAS Ampeln](plugins/gevas.js) | Ampelprognosen (Düsseldorf u. a.) | `gruenzeit.gevas.eu`, `prognose.gevas.eu` |
+| [blitzer.de](plugins/blitzer.js) | Blitzer, Polizeikontrollen, gemeldete Messstrecken | `cdn2.atudo.net` |
 
 > Die Plugins hier nutzen inoffizielle Schnittstellen und sind nur für den privaten Gebrauch.
 
@@ -35,7 +36,7 @@ Monav.register({
   version: "1.0",                   // höher = Update in Monav
   author: "Du",
   description: "Was es kann, in einem Satz.",
-  provides: ["trafficLights"],
+  provides: ["trafficLights"],      // oder "speedCameras", oder beides
   hosts: ["api.example.com"],       // nur diese Server darf es aufrufen (Subdomains inklusive)
   settings: [                       // optional: Felder in Monav › Plugins › dein Plugin
     { key: "apiKey", label: "API-Schlüssel", secret: true },
@@ -84,6 +85,23 @@ Geschwindigkeitsempfehlung. Prognosen, die nie zwischen Rot und Grün wechseln, 
 
 **`forecasts({ ids, position })`** – optional, alle acht Sekunden für bekannte Ampeln: frische
 Prognosen, gleiche Felder wie oben (`id`, `forecast`, `start` genügen).
+
+**`speedCameras({ position })`** – mit `provides: ["speedCameras"]`, etwa alle 1,5 km oder zwei
+Minuten, für rund 7 × 7 km um `position` (`{ latitude, longitude }`). Antwort:
+
+```js
+{
+  cameras: [{ id, latitude, longitude, kind: "fixedSpeed", vmax: 50, street, city, note }],
+  zones: [{ id, kind: "mobileSpeed", polyline: "…", lengthKm }],   // optional
+}
+```
+
+`kind`: `fixedSpeed`, `mobileSpeed`, `trafficLight`, `sectionControl`, `distanceCheck`,
+`weightCheck`, `heightCheck`, `overtakingBan`, `policeReport`, `congestionWarning`, `trafficJam`,
+`other`. `note` ist die Beschreibung – steht darin die Richtung („FR Neuss“, „stadteinwärts“,
+„beidseitig“), warnt Monav nur in dieser Richtung. `zones` sind Strecken mit gemeldeten
+mobilen Blitzern, als Google-Polyline (`polyline`) oder `path: [[lat, lon], …]`; ohne `zones`
+bleiben die bisherigen stehen.
 
 ### Was ein Plugin hat
 
