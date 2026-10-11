@@ -151,7 +151,7 @@ function members(cluster, candidates, known) {
 Monav.register({
   id: "de.ladecloud.ladeapp",
   name: "Ladecloud",
-  version: "1.0",
+  version: "1.1",
   author: "Monav",
   description: "Ladesäulen mit Live-Verfügbarkeit, Laden mit der Ladekarte, Ladehistorie und Rechnungen – mit einem Ladeapp-Konto. Inoffiziell, nur für den privaten Gebrauch.",
   provides: ["chargers", "charging"],

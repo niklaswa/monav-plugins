@@ -111,7 +111,7 @@ function signal(group) {
 Monav.register({
   id: "de.gevas.trafficpilot",
   name: "GEVAS Ampeln",
-  version: "1.0",
+  version: "1.1",
   author: "Monav",
   description: "Ampelprognosen von GEVAS / TrafficPilot – Düsseldorf und weitere Städte. Inoffiziell, nur für den privaten Gebrauch.",
   provides: ["trafficLights"],

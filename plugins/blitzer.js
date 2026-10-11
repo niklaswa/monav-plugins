@@ -52,7 +52,7 @@ async function get(path, position) {
 Monav.register({
   id: "de.blitzer.map",
   name: "blitzer.de",
-  version: "1.0",
+  version: "1.1",
   author: "Monav",
   description: "Blitzer, Polizeikontrollen und gemeldete Messstrecken von blitzer.de. Inoffiziell, nur für den privaten Gebrauch.",
   provides: ["speedCameras"],
