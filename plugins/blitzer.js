@@ -4,25 +4,34 @@
 // Unofficial: it reads the same endpoints as the web map. For private use only.
 
 const BASE = "https://cdn2.atudo.net/api/4.0";
-const TYPES = "22,26,20,101,102,103,104,105,106,107,108,109,110,111,112,113,115,117,114,ts,0,1,2,3,4,5,6,21,23,24,25,29,vwd,traffic";
+// Cameras only: fixed installations, semi-stationary trailers, mobile controls — and the end of a
+// tailback as a warning. 21–29 are roadworks and hazards (no cameras), left out.
+const TYPES = "101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,117,ts,0,1,2,3,4,5,6,20";
 const HEADERS = {
   "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 26_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148",
   "Referer": "https://map.blitzer.de/",
   "Origin": "https://map.blitzer.de",
 };
 
-// blitzer.de type codes, as mapped in the Nav web project.
-const FIXED = ["0", "1", "2", "3", "4", "5", "6", "ts", "101", "102", "103", "104", "105", "106", "107",
-               "108", "109", "110", "111", "112", "113", "115", "117"];
+// blitzer.de type codes as map.blitzer.de itself names and groups them (`type_arr` and the
+// `txt_type_*` labels of its web map). 101–117 are fixed installations, `ts` semi-stationary
+// trailers, 0–6 mobile controls reported by drivers; 20 is the end of a tailback. Everything else
+// (22/26 roadworks, 21/23/24/25/29 accidents, obstacles, ice, poor view, broken-down cars) is no
+// camera — version 1.1 took 26 (permanent roadworks) for mobile cameras.
 const KINDS = {
-  "20": "mobileSpeed", "26": "mobileSpeed", "21": "distanceCheck", "22": "trafficLight",
-  "23": "weightCheck", "24": "heightCheck", "25": "overtakingBan", "29": "policeReport",
-  "114": "sectionControl", "vwd": "congestionWarning", "traffic": "trafficJam",
+  "101": "distanceCheck", "102": "other" /* dummy */, "103": "other" /* access */, "104": "other" /* lane */,
+  "105": "other" /* entrance */, "106": "trafficLight" /* pedestrian crossing */, "107": "fixedSpeed",
+  "108": "weightCheck", "109": "heightCheck", "110": "trafficLight" /* red light and speed */,
+  "111": "trafficLight", "112": "sectionControl", "113": "sectionControl", "114": "fixedSpeed" /* tunnel */,
+  "115": "overtakingBan", "117": "policeReport" /* stationary police check */, "ts": "fixedSpeed",
+  "0": "other", "1": "mobileSpeed", "2": "trafficLight", "3": "weightCheck", "4": "policeReport",
+  "5": "policeReport" /* alcohol */, "6": "distanceCheck",
+  "20": "congestionWarning",
 };
 const ENFORCEMENT = ["fixedSpeed", "mobileSpeed", "trafficLight", "sectionControl", "distanceCheck", "other"];
 
 function kind(type) {
-  return FIXED.includes(type) ? "fixedSpeed" : KINDS[type] || "other";
+  return KINDS[type] || null;
 }
 
 // Roughly 7 × 7 km around the car: south, west, north, east.
@@ -52,7 +61,7 @@ async function get(path, position) {
 Monav.register({
   id: "de.blitzer.map",
   name: "blitzer.de",
-  version: "1.1",
+  version: "1.2",
   author: "Monav",
   description: "Blitzer, Polizeikontrollen und gemeldete Messstrecken von blitzer.de. Inoffiziell, nur für den privaten Gebrauch.",
   provides: ["speedCameras"],
@@ -66,7 +75,8 @@ Monav.register({
     ]);
 
     const cameras = (pois.pois || [])
-      .filter(poi => poi.type !== "cluster" && poi.type !== "pics" && number(poi.lat))
+      // Only what is known: anything else the server adds (roadworks, hazards) is no camera.
+      .filter(poi => kind(String(poi.type)) && number(poi.lat))
       .map(poi => {
         const address = object(poi.address);
         const vmax = number(poi.vmax);
@@ -76,7 +86,7 @@ Monav.register({
           kind: kind(String(poi.type)),
           vmax: vmax && vmax > 0 ? vmax : null,
           street: address.street || "", city: address.city || "",
-          note: object(poi.info).desc || "",
+          note: object(poi.info).desc || (String(poi.type) === "ts" ? "Teilstationär" : ""),
         };
       });
 

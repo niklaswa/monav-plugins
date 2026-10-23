@@ -4,7 +4,7 @@
     {
       "id": "de.blitzer.map",
       "name": "blitzer.de",
-      "version": "1.1",
+      "version": "1.2",
       "description": "Blitzer, Polizeikontrollen und gemeldete Messstrecken von blitzer.de. Inoffiziell, nur für den privaten Gebrauch.",
       "provides": [
         "speedCameras"
