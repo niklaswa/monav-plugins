@@ -46,6 +46,7 @@ Monav.register({
   hosts: ["api.example.com"],       // nur diese Server darf es aufrufen (Subdomains inklusive)
   settings: [                       // optional: Felder in Monav › Plugins › dein Plugin
     { key: "apiKey", label: "API-Schlüssel", secret: true },
+    { key: "userAgent", label: "User-Agent", default: "Beispiel/1.0" },  // vorausgefüllt; leer = wieder der Default
   ],
 
   async trafficLights({ track }) {

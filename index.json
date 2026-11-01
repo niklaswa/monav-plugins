@@ -17,7 +17,7 @@
     {
       "id": "de.gevas.trafficpilot",
       "name": "GEVAS Ampeln",
-      "version": "1.1",
+      "version": "1.2",
       "description": "Ampelprognosen von GEVAS / TrafficPilot – Düsseldorf und weitere Städte. Inoffiziell, nur für den privaten Gebrauch.",
       "provides": [
         "trafficLights"
@@ -31,7 +31,7 @@
     {
       "id": "de.ladecloud.ladeapp",
       "name": "Ladecloud",
-      "version": "1.1",
+      "version": "1.2",
       "description": "Ladesäulen mit Live-Verfügbarkeit, Laden mit der Ladekarte, Ladehistorie und Rechnungen – mit einem Ladeapp-Konto. Inoffiziell, nur für den privaten Gebrauch.",
       "provides": [
         "chargers",

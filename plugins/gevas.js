@@ -8,14 +8,23 @@
 // last three GPS points into the signal groups ahead; `v18/predForSg` refreshes the forecasts
 // of groups already known.
 
-const KEY = "ac687a68ea";
+// TrafficPilot's own key and how the app introduces itself: the settings' defaults, and what
+// counts when they are empty (Monav before 1.0 build 16 knows no defaults).
+const DEFAULT_KEY = "ac687a68ea";
+const DEFAULT_USER_AGENT = "TrafficPilot/3.0.37 (de.gevas.noserv.trafficpilot; build:237; iOS 26.1.0) Alamofire/5.6.4";
 const SELECTION = "https://gruenzeit.gevas.eu/ssp-apha/rest/serverselection/v11/query";
 const FALLBACK = "https://prognose.gevas.eu/duesseldorf/ssp-apha/rest/position";
-const HEADERS = {
-  "User-Agent": "TrafficPilot/3.0.37 (de.gevas.noserv.trafficpilot; build:237; iOS 26.1.0) Alamofire/5.6.4",
-  "Accept-Language": "de-DE;q=1.0, en-US;q=0.9",
-  "Accept": "*/*",
-};
+function setting(key, fallback) {
+  return (Monav.setting(key) || "").trim() || fallback;
+}
+
+function headers() {
+  return {
+    "User-Agent": setting("userAgent", DEFAULT_USER_AGENT),
+    "Accept-Language": "de-DE;q=1.0, en-US;q=0.9",
+    "Accept": "*/*",
+  };
+}
 
 const TURNS = {
   LEFT: "left", LEFTISH: "slightLeft", AHEAD: "straight",
@@ -35,9 +44,13 @@ function deviceId() {
 }
 
 async function post(url, body) {
-  const response = await fetch(url, { method: "POST", headers: HEADERS, json: body });
+  const response = await fetch(url, { method: "POST", headers: headers(), json: body });
   if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.text.slice(0, 160)}`);
   return response;
+}
+
+function key() {
+  return setting("apiKey", DEFAULT_KEY);
 }
 
 async function server(point) {
@@ -48,7 +61,7 @@ async function server(point) {
   let url;
   try {
     const response = await post(SELECTION, {
-      key: KEY, distance: 0, heading: point.heading, utcTime: Date.now(),
+      key: key(), distance: 0, heading: point.heading, utcTime: Date.now(),
       longitude: point.longitude, altitude: 40, speed: point.speed, latitude: point.latitude,
     });
     // e.g. "https://prognose.gevas.eu/duesseldorf/ssp-apha/rest/position;1"
@@ -111,11 +124,15 @@ function signal(group) {
 Monav.register({
   id: "de.gevas.trafficpilot",
   name: "GEVAS Ampeln",
-  version: "1.1",
+  version: "1.2",
   author: "Monav",
   description: "Ampelprognosen von GEVAS / TrafficPilot – Düsseldorf und weitere Städte. Inoffiziell, nur für den privaten Gebrauch.",
   provides: ["trafficLights"],
   hosts: ["gruenzeit.gevas.eu", "prognose.gevas.eu"],
+  settings: [
+    { key: "apiKey", label: "API-Schlüssel", default: DEFAULT_KEY },
+    { key: "userAgent", label: "User-Agent", default: DEFAULT_USER_AGENT },
+  ],
 
   async trafficLights({ track }) {
     if (track.length < 3) return null;
@@ -125,7 +142,7 @@ Monav.register({
     const now = Date.now();
     const response = await post(`${base}/v18`, {
       utcTime: String(now), lsastate: 0, gpsRecords: records(track),
-      uuid: deviceId(), key: KEY, value: 0,
+      uuid: deviceId(), key: key(), value: 0,
     });
     const answer = response.json();
     const limit = number(answer.speedlimit);
@@ -142,7 +159,7 @@ Monav.register({
     // The server takes at most 50 ids per call.
     for (let start = 0; start < ids.length; start += 50) {
       const response = await post(`${base}/v18/predForSg`, {
-        sgUids: ids.slice(start, start + 50), uuid: deviceId(), key: KEY,
+        sgUids: ids.slice(start, start + 50), uuid: deviceId(), key: key(),
         utcTime: String(Date.now()), lsastate: 0, value: 0,
       });
       groups.push(...(response.json().predictionSignalgroups || []));

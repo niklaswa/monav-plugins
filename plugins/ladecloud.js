@@ -6,8 +6,14 @@
 // use only. Starting a charge costs money — Monav asks before it calls `startCharging`.
 
 const BASE = "https://backend.ladecloud.de/ladeapp-api/api/v1";
-const API_KEY = "3I0BlnUejEkEAj30uMtkeoDaojiHzifGeP5M";
-const USER_AGENT = "ladeapp/3.8 (de.ladenetz.ladeapp; build:20260429112147; iOS 27.0.0) Alamofire/5.11.2";
+// The Ladeapp's key and how the app introduces itself: the settings' defaults, and what counts
+// when they are empty (Monav before 1.0 build 16 knows no defaults).
+const DEFAULT_API_KEY = "3I0BlnUejEkEAj30uMtkeoDaojiHzifGeP5M";
+const DEFAULT_USER_AGENT = "ladeapp/3.8 (de.ladenetz.ladeapp; build:20260429112147; iOS 27.0.0) Alamofire/5.11.2";
+
+function setting(key, fallback) {
+  return (Monav.setting(key) || "").trim() || fallback;
+}
 
 // The HUD map is zoomed in to street level, so ask at street level: at the city zoom the server
 // merges nearby stations into clusters drawn where no station stands (in the recorded Ladeapp
@@ -27,9 +33,9 @@ function headers() {
     Monav.storage.set("installationId", installation);
   }
   return {
-    "X-API-KEY": API_KEY,
+    "X-API-KEY": setting("apiKey", DEFAULT_API_KEY),
     "app-installation-id": installation,
-    "User-Agent": USER_AGENT,
+    "User-Agent": setting("userAgent", DEFAULT_USER_AGENT),
     "Accept": "*/*",
     "Accept-Language": "de-DE;q=1.0, en-US;q=0.9",
   };
@@ -151,11 +157,15 @@ function members(cluster, candidates, known) {
 Monav.register({
   id: "de.ladecloud.ladeapp",
   name: "Ladecloud",
-  version: "1.1",
+  version: "1.2",
   author: "Monav",
   description: "Ladesäulen mit Live-Verfügbarkeit, Laden mit der Ladekarte, Ladehistorie und Rechnungen – mit einem Ladeapp-Konto. Inoffiziell, nur für den privaten Gebrauch.",
   provides: ["chargers", "charging"],
   hosts: ["backend.ladecloud.de"],
+  settings: [
+    { key: "apiKey", label: "API-Schlüssel", default: DEFAULT_API_KEY },
+    { key: "userAgent", label: "User-Agent", default: DEFAULT_USER_AGENT },
+  ],
 
   // MARK: Account
 
