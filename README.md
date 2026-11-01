@@ -8,8 +8,13 @@ selbst geschrieben.
 | [GEVAS Ampeln](plugins/gevas.js) | Ampelprognosen (Düsseldorf u. a.) | `gruenzeit.gevas.eu`, `prognose.gevas.eu` |
 | [blitzer.de](plugins/blitzer.js) | Blitzer, Polizeikontrollen, gemeldete Messstrecken | `cdn2.atudo.net` |
 | [Ladecloud](plugins/ladecloud.js) | Ladesäulen live, Laden mit der Ladekarte, Ladehistorie, Rechnungen (Ladeapp-Konto) | `backend.ladecloud.de` |
+| [OpenStreetMap](plugins/osm-tiles.js) | Karte fürs Display aus OpenStreetMap, für die Nacht abgedunkelt | `tile.openstreetmap.org` |
+| [MapTiler Dark](plugins/maptiler-tiles.js) | Karte fürs Display im Stil „Dataviz Dark“ (MapTiler-Schlüssel) | `api.maptiler.com` |
+| [Stadia Maps Dark](plugins/stadia-tiles.js) | Karte fürs Display im Stil „Alidade Smooth Dark“ (Stadia-Schlüssel) | `tiles.stadiamaps.com` |
 
-> Die Plugins hier nutzen inoffizielle Schnittstellen und sind nur für den privaten Gebrauch.
+> GEVAS, blitzer.de und Ladecloud nutzen inoffizielle Schnittstellen und sind nur für den privaten
+> Gebrauch. Die Karten-Plugins nutzen die offiziellen Kachelserver der Anbieter, zu deren
+> Bedingungen; die Karte wählst du in Monav unter *Display im Auto › Kartenquelle*.
 
 ## In Monav einbinden
 

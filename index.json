@@ -41,6 +41,45 @@
         "backend.ladecloud.de"
       ],
       "file": "plugins/ladecloud.js"
+    },
+    {
+      "id": "com.maptiler.tiles",
+      "name": "MapTiler Dark",
+      "version": "1.0",
+      "description": "Die Karte auf dem Display im dunklen Stil „Dataviz Dark“ von MapTiler. Braucht einen kostenlosen MapTiler-Schlüssel.",
+      "provides": [
+        "mapTiles"
+      ],
+      "hosts": [
+        "api.maptiler.com"
+      ],
+      "file": "plugins/maptiler-tiles.js"
+    },
+    {
+      "id": "org.openstreetmap.tiles",
+      "name": "OpenStreetMap",
+      "version": "1.0",
+      "description": "Die Karte auf dem Display aus OpenStreetMap statt Apple Karten, für die Nacht abgedunkelt. Ohne Konto.",
+      "provides": [
+        "mapTiles"
+      ],
+      "hosts": [
+        "tile.openstreetmap.org"
+      ],
+      "file": "plugins/osm-tiles.js"
+    },
+    {
+      "id": "com.stadiamaps.tiles",
+      "name": "Stadia Maps Dark",
+      "version": "1.0",
+      "description": "Die Karte auf dem Display im dunklen Stil „Alidade Smooth Dark“ von Stadia Maps. Braucht einen Stadia-Schlüssel.",
+      "provides": [
+        "mapTiles"
+      ],
+      "hosts": [
+        "tiles.stadiamaps.com"
+      ],
+      "file": "plugins/stadia-tiles.js"
     }
   ]
 }
